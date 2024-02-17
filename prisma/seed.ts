@@ -13,32 +13,52 @@ async function seed() {
 
   const hashedPassword = await bcrypt.hash("racheliscool", 10);
 
-  const user = await prisma.user.create({
+  const family = await prisma.family.create({
     data: {
-      email,
-      password: {
+      name: "The Smiths",
+      members: {
         create: {
-          hash: hashedPassword,
+          email,
+          password: {
+            create: {
+              hash: hashedPassword,
+            },
+          },
         },
       },
-    },
+    }
   });
 
-  await prisma.note.create({
+  await prisma.car.create({
     data: {
-      title: "My first note",
-      body: "Hello, world!",
-      userId: user.id,
-    },
-  });
+      name: "Honda Civic",
+      familyId: family.id
+    }
+  })
 
-  await prisma.note.create({
-    data: {
-      title: "My second note",
-      body: "Hello, world!",
-      userId: user.id,
-    },
-  });
+  // const user = await prisma.user.upsert({
+  //   where: { email: 'rachel@remix.run' },
+  //   create: {
+      
+  //     familyId: family.id
+  //   },
+  // });
+
+  // await prisma.note.create({
+  //   data: {
+  //     title: "My first note",
+  //     body: "Hello, world!",
+  //     userId: user.id,
+  //   },
+  // });
+
+  // await prisma.note.create({
+  //   data: {
+  //     title: "My second note",
+  //     body: "Hello, world!",
+  //     userId: user.id,
+  //   },
+  // });
 
   console.log(`Database has been seeded. 🌱`);
 }

@@ -2,34 +2,27 @@ import type { ActionFunctionArgs } from "@remix-run/node";
 import { json, redirect } from "@remix-run/node";
 import { Form, useActionData } from "@remix-run/react";
 import { useEffect, useRef } from "react";
+import { createCar } from "~/models/car.server";
 
-import { createNote } from "~/models/note.server";
-import { requireUserId } from "~/session.server";
+import { getFamilyId, requireFamilyId, requireUserId } from "~/session.server";
 
 export const action = async ({ request }: ActionFunctionArgs) => {
   const userId = await requireUserId(request);
+  const familyId = await requireFamilyId(request);
 
   const formData = await request.formData();
-  const title = formData.get("title");
-  const body = formData.get("body");
+  const name = formData.get("title");
 
-  if (typeof title !== "string" || title.length === 0) {
+  if (typeof name !== "string" || name.length === 0) {
     return json(
-      { errors: { body: null, title: "Title is required" } },
+      { errors: { body: null, title: "Name is required" } },
       { status: 400 },
     );
   }
 
-  if (typeof body !== "string" || body.length === 0) {
-    return json(
-      { errors: { body: "Body is required", title: null } },
-      { status: 400 },
-    );
-  }
+  const note = await createCar(name, familyId);
 
-  const note = await createNote({ body, title, userId });
-
-  return redirect(`/notes/${note.id}`);
+  return redirect(`/cars/${note.id}`);
 };
 
 export default function NewNotePage() {
@@ -57,7 +50,7 @@ export default function NewNotePage() {
     >
       <div>
         <label className="flex w-full flex-col gap-1">
-          <span>Title: </span>
+          <span>Name: </span>
           <input
             ref={titleRef}
             name="title"
@@ -75,7 +68,7 @@ export default function NewNotePage() {
         ) : null}
       </div>
 
-      <div>
+      {/* <div>
         <label className="flex w-full flex-col gap-1">
           <span>Body: </span>
           <textarea
@@ -94,7 +87,7 @@ export default function NewNotePage() {
             {actionData.errors.body}
           </div>
         ) : null}
-      </div>
+      </div> */}
 
       <div className="text-right">
         <button

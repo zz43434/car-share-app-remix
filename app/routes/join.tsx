@@ -64,6 +64,7 @@ export const action = async ({ request }: ActionFunctionArgs) => {
     remember: false,
     request,
     userId: user.id,
+    familyId: user.familyId,
   });
 };
 

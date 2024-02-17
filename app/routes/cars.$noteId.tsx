@@ -7,15 +7,17 @@ import {
   useRouteError,
 } from "@remix-run/react";
 import invariant from "tiny-invariant";
+import { deleteCarById, getCarById } from "~/models/car.server";
 
 import { deleteNote, getNote } from "~/models/note.server";
 import { requireUserId } from "~/session.server";
 
 export const loader = async ({ params, request }: LoaderFunctionArgs) => {
   const userId = await requireUserId(request);
+
   invariant(params.noteId, "noteId not found");
 
-  const note = await getNote({ id: params.noteId, userId });
+  const note = await getCarById(params.noteId);
   if (!note) {
     throw new Response("Not Found", { status: 404 });
   }
@@ -26,9 +28,9 @@ export const action = async ({ params, request }: ActionFunctionArgs) => {
   const userId = await requireUserId(request);
   invariant(params.noteId, "noteId not found");
 
-  await deleteNote({ id: params.noteId, userId });
+  await deleteCarById(params.noteId);
 
-  return redirect("/notes");
+  return redirect("/cars");
 };
 
 export default function NoteDetailsPage() {
@@ -36,8 +38,8 @@ export default function NoteDetailsPage() {
 
   return (
     <div>
-      <h3 className="text-2xl font-bold">{data.note.title}</h3>
-      <p className="py-6">{data.note.body}</p>
+      <h3 className="text-2xl font-bold">{data.note.name}</h3>
+      <p className="py-6">{data.note.name}</p>
       <hr className="my-4" />
       <Form method="post">
         <button

@@ -3,6 +3,7 @@ import invariant from "tiny-invariant";
 
 import type { User } from "~/models/user.server";
 import { getUserById } from "~/models/user.server";
+import { getFamilyById } from "./models/family.server";
 
 invariant(process.env.SESSION_SECRET, "SESSION_SECRET must be set");
 
@@ -18,10 +19,19 @@ export const sessionStorage = createCookieSessionStorage({
 });
 
 const USER_SESSION_KEY = "userId";
+const FAMILY_SESSION_KEY = "familyId";
 
 export async function getSession(request: Request) {
   const cookie = request.headers.get("Cookie");
   return sessionStorage.getSession(cookie);
+}
+
+export async function getFamilyId(
+  request: Request,
+): Promise<User["familyId"] | undefined> {
+  const session = await getSession(request);
+  const familyId = session.get(FAMILY_SESSION_KEY);
+  return familyId;
 }
 
 export async function getUserId(
@@ -40,6 +50,28 @@ export async function getUser(request: Request) {
   if (user) return user;
 
   throw await logout(request);
+}
+
+export async function getFamily(request: Request) {
+  const familyId = await getFamilyId(request);
+  if (familyId === undefined) return null;
+
+  const family = await getFamilyById(familyId);
+  if (family) return family;
+
+  throw await logout(request);
+}
+
+export async function requireFamilyId(
+  request: Request,
+  redirectTo: string = new URL(request.url).pathname,
+) {
+  const familyId = await getFamilyId(request);
+  if (!familyId) {
+    const searchParams = new URLSearchParams([["redirectTo", redirectTo]]);
+    throw redirect(`/login?${searchParams}`);
+  }
+  return familyId;
 }
 
 export async function requireUserId(
@@ -68,14 +100,17 @@ export async function createUserSession({
   userId,
   remember,
   redirectTo,
+  familyId
 }: {
   request: Request;
   userId: string;
   remember: boolean;
   redirectTo: string;
+  familyId: string;
 }) {
   const session = await getSession(request);
   session.set(USER_SESSION_KEY, userId);
+  session.set(FAMILY_SESSION_KEY, familyId);
   return redirect(redirectTo, {
     headers: {
       "Set-Cookie": await sessionStorage.commitSession(session, {
