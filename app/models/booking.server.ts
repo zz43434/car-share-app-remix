@@ -9,6 +9,9 @@ export async function getBookingByUserId(id: string) {
   return prisma.booking.findMany({ where: { userId: id } });
 }
 
+export async function getBookingByCarId(id: string) {
+  return prisma.booking.findMany({ where: { carId: id }, include: {car: true, user: true} });
+}
 
 export async function getBookingsByFamily(id: string) {
   return prisma.booking.findMany({ where: { familyId: id } });

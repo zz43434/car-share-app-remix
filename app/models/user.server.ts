@@ -13,6 +13,10 @@ export async function getUserByEmail(email: User["email"]) {
   return prisma.user.findUnique({ where: { email } });
 }
 
+export async function getUsersByFamilyId(familyId: User["familyId"]) {
+  return prisma.user.findMany({ where: { familyId } });
+}
+
 export async function createUser(email: string, password: string, familyId?: string) {
   if (!familyId) {
     const family = await prisma.family.create({

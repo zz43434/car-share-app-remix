@@ -1,6 +1,6 @@
 import { Link } from "@remix-run/react";
 
-export default function NoteIndexPage() {
+export default function Cars() {
   return (
     <p>
       No car selected. Select a car on the left, or{" "}

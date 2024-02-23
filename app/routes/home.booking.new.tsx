@@ -40,23 +40,26 @@ export const action = async ({ request }: ActionFunctionArgs) => {
   const dateTimeStart = new Date(formData.get("dateTimeStart")?.toString() ?? '');
   const dateTimeEnd = new Date(formData.get("dateTimeEnd")?.toString() ?? '');
 
+  console.log(dateTimeStart, dateTimeEnd);
   console.log(name, car, dateTimeStart, dateTimeEnd);
 
-  const errors = checkFields(name, car, dateTimeStart, dateTimeEnd);
+  // const errors = checkFields(name, car, dateTimeStart, dateTimeEnd);
 
-  console.log('Errors: ', errors);
-  if (errors) {
-    return json(
-      { errors },
-      { status: 400 },
-    );
-  }
+  // console.log('Errors: ', errors);
+  // if (errors) {
+  //   return json(
+  //     { errors },
+  //     { status: 400 },
+  //   );
+  // }
 
   const boooking = await createBooking(name ?? '', familyId, userId, car ?? '', dateTimeStart, dateTimeEnd);
 
+  console.log('Booking: ', boooking);
+
   // const note = await createCar(name, familyId);
 
-  return redirect(`/booking`);
+  return redirect(`/home/booking`);
 };
 
 export const loader = async ({ params, request }: LoaderFunctionArgs) => {

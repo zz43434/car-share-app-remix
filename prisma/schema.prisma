@@ -16,6 +16,8 @@ model User {
 
   password Password?
 
+  isAdmin Boolean
+
   family   Family    @relation("Family", fields: [familyId], references: [id])
   familyId String    
   

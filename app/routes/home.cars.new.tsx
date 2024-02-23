@@ -22,7 +22,7 @@ export const action = async ({ request }: ActionFunctionArgs) => {
 
   const note = await createCar(name, familyId);
 
-  return redirect(`/cars/${note.id}`);
+  return redirect(`/home/cars/${note.id}`);
 };
 
 export default function NewNotePage() {
